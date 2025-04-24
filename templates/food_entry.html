@@ -9,317 +9,190 @@
 <body>
 <main class="food-entry-container">
 
-  <!-- ── тулбар: суммарно за день + история внутри него ── -->
+  <!-- ── тулбар: история + суммарно за день ── -->
   <header class="toolbar">
-    {# Список сокращённых дней недели для подписей #}
+    {# сокращённые подписи дней #}
     {% set weekdays = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'] %}
+
+    <!-- История за неделю -->
     <div class="history-container">
       <div class="history-header">
-        <input type="date" id="week-picker" value="{{ week_start }}" style="display:inline-block;">
+        <input type="date" id="week-picker"
+               value="{{ week_start }}" />
       </div>
       <div class="history-items">
         {% for day in history_data %}
-        <div class="history-item selectable-day {% if day.date == selected_date %}active{% endif %}"
-             data-date="{{ day.date }}" data-calories="{{ day.calories }}">
-          <canvas class="history-chart" width="40" height="40"></canvas>
+        <div class="history-item selectable-day
+                    {% if day.date == selected_date %}active{% endif %}"
+             data-date="{{ day.date }}"
+             data-calories="{{ day.calories }}">
+          <canvas class="history-chart" width="32" height="32"></canvas>
           <div class="history-label">{{ weekdays[loop.index0] }}</div>
         </div>
         {% endfor %}
       </div>
     </div>
+
+    <!-- Сводка за выбранный день -->
     <table class="summary-table">
-      <thead>
-        <tr>
-          <th></th><th></th>
-          <th>Ккал</th>
-          <th>Б, г</th>
-          <th>Ж, г</th>
-          <th>У, г</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td></td><td></td>
-          <td><strong>{{ '%.1f' % totals.kcal }}</strong></td>
-          <td><strong>{{ '%.1f' % totals.protein }}</strong></td>
-          <td><strong>{{ '%.1f' % totals.fat }}</strong></td>
-          <td><strong>{{ '%.1f' % totals.carbs }}</strong></td>
-        </tr>
-      </tbody>
+      <tr>
+        <td>Ккал <strong>{{ '%.1f' % totals.kcal }}</strong></td>
+        <td>Б, г <strong>{{ '%.1f' % totals.protein }}</strong></td>
+        <td>Ж, г <strong>{{ '%.1f' % totals.fat }}</strong></td>
+        <td>У, г <strong>{{ '%.1f' % totals.carbs }}</strong></td>
+      </tr>
     </table>
   </header>
-
 
   <!-- Левая панель -->
   <aside class="left-panel">
     <div class="left-chart">
       <h3>Калории за день</h3>
+
       <canvas id="daily-chart" width="150" height="150"></canvas>
+
       <p class="chart-text">Потреблено: <strong>{{ totals.kcal }}</strong> Ккал</p>
       <p class="chart-text">Цель: <strong>{{ norm_cal }}</strong> Ккал</p>
-      <button class="back-btn"
-        onclick="location='{{ url_for('product_db', next='food_entry', day=selected_date) }}'">
-  Добавить продукт
-</button>
-      <form action="{{ url_for('main') }}" method="get">
 
-        <button class="back-btn" type="submit">Назад</button>
-      </form>
+      <button class="back-btn"
+              onclick="location='{{ url_for('product_db',
+                                            next='food_entry',
+                                            day=selected_date) }}'">
+        Добавить продукт
+      </button>
+      <button class="back-btn" onclick="location='{{ url_for('main') }}'">
+        Назад
+      </button>
     </div>
   </aside>
 
   <!-- Три панели приёмов пищи -->
   <section class="entry-content">
-    <!-- Завтрак -->
-    <div class="meal-panel open">
-      <div class="meal-header">
-        <h3>Завтрак</h3>
-      </div>
-      <div class="meal-body">
-        <table class="meal-table">
-          <thead>
-            <tr>
-              <th>Продукт</th>
-              <th>Грамм</th>
-              <th>Ккал</th>
-              <th>Б</th>
-              <th>Ж</th>
-              <th>У</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for item in meals[1] %}
-            <tr data-entry="{{ item.id }}">
-              <td>{{ item.name }}</td>
-              <td>{{ item.qty }}</td>
-              <td>{{ '%.1f' % item.kcal }}</td>
-              <td>{{ '%.1f' % item.protein }}</td>
-              <td>{{ '%.1f' % item.fat }}</td>
-              <td>{{ '%.1f' % item.carbs }}</td>
-              <td><button class="del-btn" type="button">✕</button></td>
-            </tr>
-            {% else %}
-            <tr><td colspan="7" class="empty">Нет записей</td></tr>
-            {% endfor %}
-          </tbody>
-          <tfoot>
-            <tr>
-              <td></td><td></td>
-              <td><strong>{{ '%.1f' % meal_sums[1].kcal }}</strong></td>
-              <td><strong>{{ '%.1f' % meal_sums[1].protein }}</strong></td>
-              <td><strong>{{ '%.1f' % meal_sums[1].fat }}</strong></td>
-              <td><strong>{{ '%.1f' % meal_sums[1].carbs }}</strong></td>
-              <td></td>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
-    </div>
-    <!-- Обед -->
-    <div class="meal-panel">
-      <div class="meal-header">
-        <h3>Обед</h3>
-      </div>
-      <div class="meal-body">
-        <table class="meal-table">
-          <thead>
-            <tr>
-              <th>Продукт</th>
-              <th>Грамм</th>
-              <th>Ккал</th>
-              <th>Б</th>
-              <th>Ж</th>
-              <th>У</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for item in meals[2] %}
-            <tr data-entry="{{ item.id }}">
-              <td>{{ item.name }}</td>
-              <td>{{ item.qty }}</td>
-              <td>{{ '%.1f' % item.kcal }}</td>
-              <td>{{ '%.1f' % item.protein }}</td>
-              <td>{{ '%.1f' % item.fat }}</td>
-              <td>{{ '%.1f' % item.carbs }}</td>
-              <td><button class="del-btn" type="button">✕</button></td>
-            </tr>
-            {% else %}
-            <tr><td colspan="7" class="empty">Нет записей</td></tr>
-            {% endfor %}
-          </tbody>
-          <tfoot>
-            <tr>
-              <td></td><td></td>
-              <td><strong>{{ '%.1f' % meal_sums[2].kcal }}</strong></td>
-              <td><strong>{{ '%.1f' % meal_sums[2].protein }}</strong></td>
-              <td><strong>{{ '%.1f' % meal_sums[2].fat }}</strong></td>
-              <td><strong>{{ '%.1f' % meal_sums[2].carbs }}</strong></td>
-              <td></td>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
-    </div>
-    <!-- Ужин -->
-    <div class="meal-panel">
-      <div class="meal-header">
-        <h3>Ужин</h3>
-      </div>
-      <div class="meal-body">
-        <table class="meal-table">
-          <thead>
-            <tr>
-              <th>Продукт</th>
-              <th>Грамм</th>
-              <th>Ккал</th>
-              <th>Б</th>
-              <th>Ж</th>
-              <th>У</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for item in meals[3] %}
-            <tr data-entry="{{ item.id }}">
-              <td>{{ item.name }}</td>
-              <td>{{ item.qty }}</td>
-              <td>{{ '%.1f' % item.kcal }}</td>
-              <td>{{ '%.1f' % item.protein }}</td>
-              <td>{{ '%.1f' % item.fat }}</td>
-              <td>{{ '%.1f' % item.carbs }}</td>
-              <td><button class="del-btn" type="button">✕</button></td>
-            </tr>
-            {% else %}
-            <tr><td colspan="7" class="empty">Нет записей</td></tr>
-            {% endfor %}
-          </tbody>
-          <tfoot>
-            <tr>
-              <td></td><td></td>
-              <td><strong>{{ '%.1f' % meal_sums[3].kcal }}</strong></td>
-              <td><strong>{{ '%.1f' % meal_sums[3].protein }}</strong></td>
-              <td><strong>{{ '%.1f' % meal_sums[3].fat }}</strong></td>
-              <td><strong>{{ '%.1f' % meal_sums[3].carbs }}</strong></td>
-              <td></td>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
-    </div>
-  </section>
 
+    {% for meal_idx,label in [(1,'Завтрак'),(2,'Обед'),(3,'Ужин')] %}
+    <div class="meal-panel{% if meal_idx==1 %} open{% endif %}">
+      <div class="meal-header"><h3>{{ label }}</h3></div>
+
+      <div class="meal-body">
+        <table class="meal-table">
+          <thead>
+            <tr>
+              <th>Продукт</th><th>Грамм</th>
+              <th>Ккал</th><th>Б</th><th>Ж</th><th>У</th><th></th>
+            </tr>
+          </thead>
+
+          <tbody>
+          {% for item in meals[meal_idx] %}
+            <tr data-entry="{{ item.id }}">
+              <td>{{ item.name }}</td>
+              <td>{{ item.qty }}</td>
+              <td>{{ '%.1f' % item.kcal }}</td>
+              <td>{{ '%.1f' % item.protein }}</td>
+              <td>{{ '%.1f' % item.fat }}</td>
+              <td>{{ '%.1f' % item.carbs }}</td>
+              <td><button class="del-btn" type="button">✕</button></td>
+            </tr>
+          {% else %}
+            <tr><td colspan="7" class="empty">Нет записей</td></tr>
+          {% endfor %}
+          </tbody>
+
+          <tfoot>
+            <tr>
+              <td></td><td></td>
+              <td><strong>{{ '%.1f' % meal_sums[meal_idx].kcal }}</strong></td>
+              <td><strong>{{ '%.1f' % meal_sums[meal_idx].protein }}</strong></td>
+              <td><strong>{{ '%.1f' % meal_sums[meal_idx].fat }}</strong></td>
+              <td><strong>{{ '%.1f' % meal_sums[meal_idx].carbs }}</strong></td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+    {% endfor %}
+  </section>
 </main>
 
-<!-- переключение недели -->
+<!-- JS: выбор недели -->
 <script>
-  document.getElementById('week-picker').addEventListener('change', e => {
-    window.location = `{{ url_for('food_entry') }}?week_start=${e.target.value}`;
+  document.getElementById('week-picker').addEventListener('change', e=>{
+    location = `{{ url_for('food_entry') }}?week_start=${e.target.value}`;
   });
 </script>
 
-<!-- разворачивание панелей и удаление -->
+<!-- JS: разворот панелей / удаление строк -->
 <script>
-  const container = document.querySelector('.entry-content');
-  container.addEventListener('click', e => {
+  document.querySelector('.entry-content').addEventListener('click', e=>{
     if (e.target.classList.contains('del-btn')) {
       e.stopPropagation();
-      const row = e.target.closest('tr');
-      fetch('/delete-food', {
+      fetch('/delete-food',{
         method:'POST',
         headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({id: row.dataset.entry})
-      })
-      .then(r=>r.json()).then(d=>d.ok && window.location.reload());
+        body:JSON.stringify({id:e.target.closest('tr').dataset.entry})
+      }).then(r=>r.json()).then(d=>d.ok && location.reload());
       return;
     }
-    const panel = e.target.closest('.meal-panel');
-    if (panel) panel.classList.toggle('open');
+    const p = e.target.closest('.meal-panel');
+    if (p) p.classList.toggle('open');
   });
 </script>
 
-<!-- круговая диаграмма «за день» (большая) -->
+<!-- JS: большая круговая диаграмма -->
 <script>
-  (function(){
-    const consumed = {{ totals.kcal }}, norm = {{ norm_cal }};
-    const canvas = document.getElementById('daily-chart');
-    if (!canvas || !norm) return;
-    const dpr = window.devicePixelRatio||1,
-          size = canvas.clientWidth;
-    canvas.width = canvas.height = size * dpr;
-    canvas.style.width = canvas.style.height = size+'px';
-    const ctx = canvas.getContext('2d');
-    ctx.scale(dpr,dpr);
-    const c = size/2, track=16, ring=16, overflow=12;
-    // фон
-    ctx.lineWidth = track;
-    ctx.strokeStyle = 'rgba(100,100,100,0.2)';
-    ctx.beginPath();
-    ctx.arc(c,c,c-track,0,2*Math.PI);
-    ctx.stroke();
-    // заполненный круг
-    const ratio = Math.min(consumed/norm,1),
-          start = -0.5*Math.PI,
-          end   = start + ratio*2*Math.PI;
-    ctx.lineWidth = ring;
-    ctx.strokeStyle = '#47BF21';
-    ctx.lineCap = 'round';
-    ctx.beginPath();
-    ctx.arc(c,c,c-track,start,end);
-    ctx.stroke();
-    // превышение
-    if (consumed>norm) {
-      const over = Math.min((consumed-norm)/norm,1),
-            overEnd = start + over*2*Math.PI;
-      ctx.lineWidth = overflow;
-      ctx.strokeStyle = '#E14747';
-      ctx.beginPath();
-      ctx.arc(c,c,c-track-ring-4,start,overEnd);
-      ctx.stroke();
-    }
-  })();
+(function(){
+  const consumed={{ totals.kcal }}, norm={{ norm_cal }};
+  const cv=document.getElementById('daily-chart');
+  if(!cv||!norm) return;
+  const dpr=window.devicePixelRatio||1, size=cv.clientWidth;
+  cv.width=cv.height=size*dpr; cv.style.width=cv.style.height=size+'px';
+  const ctx=cv.getContext('2d'); ctx.scale(dpr,dpr);
+  const c=size/2, tr=16, rr=16;
+  ctx.lineWidth=tr; ctx.strokeStyle='rgba(100,100,100,0.2)';
+  ctx.beginPath(); ctx.arc(c,c,c-tr,0,2*Math.PI); ctx.stroke();
+  const ratio=Math.min(consumed/norm,1),
+        s=-.5*Math.PI, e=s+ratio*2*Math.PI;
+  ctx.lineWidth=rr; ctx.strokeStyle='#47BF21'; ctx.lineCap='round';
+  ctx.beginPath(); ctx.arc(c,c,c-tr,s,e); ctx.stroke();
+  if(consumed>norm){
+    const ov=Math.min((consumed-norm)/norm,1),
+          oe=s+ov*2*Math.PI;
+    ctx.lineWidth=12; ctx.strokeStyle='#E14747';
+    ctx.beginPath(); ctx.arc(c,c,c-tr-rr-4,s,oe); ctx.stroke();
+  }
+})();
 </script>
 
-<!-- мини-диаграммы недели -->
+<!-- JS: мини-диаграммы в истории -->
 <script>
-  (function(){
-    const norm = {{ norm_cal }};
-    document.querySelectorAll('.history-chart').forEach((canvas,i)=>{
-      const calories = +canvas.parentElement.dataset.calories;
-      const size = canvas.clientWidth;
-      const dpr = window.devicePixelRatio||1;
-      canvas.width = canvas.height = size * dpr;
-      canvas.style.width = canvas.style.height = size+'px';
-      const ctx = canvas.getContext('2d');
-      ctx.scale(dpr,dpr);
-      const c = size/2, tw=4, rw=4;
-      // фон
-      ctx.lineWidth = tw;
-      ctx.strokeStyle = 'rgba(100,100,100,0.2)';
-      ctx.beginPath();
-      ctx.arc(c,c,c-tw,0,2*Math.PI);
-      ctx.stroke();
-      // заполнение
-      const ratio = norm>0 ? Math.min(calories/norm,1) : 0;
-      const start = -0.5*Math.PI,
-            end   = start + ratio*2*Math.PI;
-      ctx.lineWidth = rw;
-      ctx.strokeStyle = '#47BF21';
-      ctx.beginPath();
-      ctx.arc(c,c,c-tw,start,end);
-      ctx.stroke();
-    });
-  })();
+(function(){
+  const norm={{ norm_cal }};
+  document.querySelectorAll('.history-chart').forEach(cv=>{
+    const cal=+cv.parentElement.dataset.calories,
+          dpr=window.devicePixelRatio||1, sz=cv.clientWidth;
+    cv.width=cv.height=sz*dpr; cv.style.width=cv.style.height=sz+'px';
+    const ctx=cv.getContext('2d'); ctx.scale(dpr,dpr);
+    const c=sz/2, t=4;
+    ctx.lineWidth=t; ctx.strokeStyle='rgba(100,100,100,0.2)';
+    ctx.beginPath(); ctx.arc(c,c,c-t,0,2*Math.PI); ctx.stroke();
+    if(norm){
+      const r=Math.min(cal/norm,1),
+            s=-.5*Math.PI, e=s+r*2*Math.PI;
+      ctx.lineWidth=4; ctx.strokeStyle='#47BF21';
+      ctx.beginPath(); ctx.arc(c,c,c-t,s,e); ctx.stroke();
+    }
+  });
+})();
 </script>
+
+<!-- JS: клик по дню -->
 <script>
   document.querySelectorAll('.selectable-day').forEach(el=>{
-    el.addEventListener('click', ()=>{
-      const d = el.dataset.date;
-      const qs = new URLSearchParams(window.location.search);
-      qs.set('day', d);
-      // keep current week_start param
-      window.location = `{{ url_for('food_entry') }}?${qs.toString()}`;
+    el.addEventListener('click',()=>{
+      const q=new URLSearchParams(location.search);
+      q.set('day',el.dataset.date);
+      location=`{{ url_for('food_entry') }}?${q.toString()}`;
     });
   });
 </script>

@@ -323,22 +323,22 @@ button.logout-btn { background: linear-gradient(135deg,#E14747,#E12C2C); }
   display: flex;
   align-items: center;
 }
+
+/* блок с календарём + мини-кругами */
 .toolbar .history-container {
-  flex: 0 0 auto;
+  flex: 0 0 auto;              /* фиксированная ширина, не растягиваем */
   display: flex;
   flex-direction: column;
   justify-content: center;
-  margin-right: 20px;
+  margin-right: 20px;          /* расстояние до summary-таблицы */
 }
+
+/* строка с date-полем */
 .toolbar .history-header {
   display: flex;
   align-items: center;
   gap: 8px;
   margin-bottom: 8px;
-}
-.toolbar .history-header h3 {
-  margin: 0;
-  font-size: 16px;
 }
 .toolbar .history-header #week-picker {
   padding: 6px 8px;
@@ -346,33 +346,73 @@ button.logout-btn { background: linear-gradient(135deg,#E14747,#E12C2C); }
   border-radius: 6px;
   background: #2c2c2c;
   color: #fff;
+  width: 115px;                /* компактнее под тулбар */
 }
+
+/* контейнер мини-кругов */
 .toolbar .history-items {
   display: flex;
   gap: 12px;
   align-items: center;
 }
+
+/* сам элемент-день */
 .toolbar .history-item {
   display: flex;
   flex-direction: column;
   align-items: center;
   min-width: 48px;
-  margin-top: 2px;
-  cursor:pointer;
+  cursor: pointer;
 }
-.toolbar .history-item.active .history-chart{
-  outline:2px solid #47BF21;
-}
-.toolbar .history-chart {
+
+
+/* мини-круг */
+/* мини-круг в истории */
+.toolbar .history-chart{
   display: block;
   width: 32px;
   height: 32px;
   margin-bottom: 2px;
+  transition: transform .25s ease, filter .25s ease;
 }
+/* эффект для выбранного дня — лёгкое увеличение и зелёное свечение */
+.toolbar .history-item.active .history-chart{
+  transform: scale(1.25);
+  filter: drop-shadow(0 0 4px #47BF21);
+}
+
+/* подпись «Пн/Вт/…» */
 .toolbar .history-label {
   font-size: 12px;
 }
+/* ------- toolbar daily summary alignment ------- */
+.toolbar .summary-table{
+  table-layout:fixed;          /* жёсткая сетка */
+}
 
+/* ячейки: текст слева, одинаковый паддинг */
+.toolbar .summary-table th,
+.toolbar .summary-table td{
+  text-align:left;
+  padding:6px 8px;
+}
+
+/* четыре колонки одинаковой ширины — 20 % каждая */
+.toolbar .summary-table th:nth-child(1),
+.toolbar .summary-table td:nth-child(1),
+.toolbar .summary-table th:nth-child(2),
+.toolbar .summary-table td:nth-child(2),
+.toolbar .summary-table th:nth-child(3),
+.toolbar .summary-table td:nth-child(3),
+.toolbar .summary-table th:nth-child(4),
+.toolbar .summary-table td:nth-child(4){
+  width:20%;
+}
+
+/* убираем прежнее выравнивание цифр вправо */
+.toolbar .summary-table strong{
+  /* раньше был float:right; */
+}
 /* сводка за день */
 .summary-table {
   width: 100%;
