@@ -253,7 +253,22 @@ def main():
         total_cal += round((r["calories_per_100g"] or 0) * r["quantity_g"] / 100.0)
     norm_cal = profile["target_cal"] or 0
 
-    return render_template("main.html", profile=profile, totals={"kcal": total_cal}, norm_cal=norm_cal)
+    # -------- weekly calories (Mon‑Sun of the current week) --------
+    today = date.today()
+    week_start = today - timedelta(days=today.weekday())  # Monday
+    week_dates = [week_start + timedelta(days=i) for i in range(7)]
+    week_cals = []
+    for d in week_dates:
+        row = db.execute(
+            """SELECT SUM((p.calories_per_100g * fe.quantity_g)/100.0) total
+               FROM food_entries fe
+               JOIN products p ON p.id = fe.product_id
+               WHERE fe.user_id = ? AND date(fe.entry_time)=?""",
+            (session["user_id"], d.isoformat())
+        ).fetchone()
+        week_cals.append(int(round(row["total"] or 0)))
+
+    return render_template("main.html", profile=profile, totals={"kcal": total_cal}, norm_cal=norm_cal, week_cals=week_cals)
 
 
 # ──────────────── страница профиля ────────────────
@@ -375,13 +390,22 @@ def add_food():
         return jsonify({'error': 'unauthorized'}), 401
     data = request.get_json(silent=True) or {}
     try:
-        name = data['name']
-        qty = float(data['qty'])
-        meal_no = int(data.get('meal') or 1)
-        kcal = float(data.get('kcal') or 0)
-        protein = float(data.get('protein') or 0)
-        fat = float(data.get('fat') or 0)
-        carbs = float(data.get('carbs') or 0)
+        name     = data['name']
+        qty      = float(data['qty'])
+        meal_no  = int(data.get('meal') or 1)
+        kcal     = float(data.get('kcal')    or 0)
+        protein  = float(data.get('protein') or 0)
+        fat      = float(data.get('fat')     or 0)
+        carbs    = float(data.get('carbs')   or 0)
+        # optional date (YYYY-MM-DD) to attach the entry to – falls back to today
+        entry_day = data.get('date')
+        if entry_day:
+            # validate format
+            from datetime import datetime
+            try:
+                datetime.strptime(entry_day, "%Y-%m-%d")
+            except ValueError:
+                entry_day = None
         if meal_no not in (1, 2, 3):
             meal_no = 1
     except (KeyError, ValueError):
@@ -390,19 +414,28 @@ def add_food():
     db = get_db()
     prod = db.execute("SELECT id FROM products WHERE name=?", (name,)).fetchone()
     if prod:
-        prod_id = prod["id"]
+        prod_id = prod['id']
     else:
         db.execute(
-            "INSERT INTO products(name, calories_per_100g, protein_g, fat_g, carbs_g) VALUES(?,?,?,?,?)",
+            """INSERT INTO products(name, calories_per_100g, protein_g, fat_g, carbs_g)
+               VALUES(?,?,?,?,?)""",
             (name, kcal, protein, fat, carbs)
         )
         prod_id = db.execute("SELECT last_insert_rowid()").fetchone()[0]
-    db.execute(
-        "INSERT INTO food_entries(user_id, product_id, quantity_g, meal_no) VALUES(?,?,?,?)",
-        (session["user_id"], prod_id, qty, meal_no)
-    )
+
+    if entry_day:
+        db.execute(
+            """INSERT INTO food_entries(user_id, product_id, quantity_g, meal_no, entry_time)
+               VALUES(?,?,?,?,?)""",
+            (session['user_id'], prod_id, qty, meal_no, f"{entry_day} 12:00:00")
+        )
+    else:
+        db.execute(
+            "INSERT INTO food_entries(user_id, product_id, quantity_g, meal_no) VALUES(?,?,?,?)",
+            (session['user_id'], prod_id, qty, meal_no)
+        )
     db.commit()
-    return jsonify({'redirect': url_for('food_entry'), 'meal': meal_no}), 200
+    return jsonify({'redirect': url_for('food_entry', day=entry_day or ''), 'meal': meal_no}), 200
 
 
 @app.route('/delete-food', methods=['POST'])
@@ -427,6 +460,12 @@ def food_entry():
     if "user_id" not in session:
         return redirect(url_for('index'))
     db = get_db()
+    # Моно‑день, который должен отображаться (для большого графика и таблиц)
+    day_str = request.args.get('day')
+    try:
+        selected_date = date.fromisoformat(day_str) if day_str else date.today()
+    except ValueError:
+        selected_date = date.today()
     # determine start of week (Monday)
     week_start_str = request.args.get('week_start')
     if week_start_str:
@@ -457,10 +496,11 @@ def food_entry():
                   p.name, p.calories_per_100g,
                   p.protein_g, p.fat_g, p.carbs_g
            FROM food_entries fe
-           JOIN products p ON p.id=fe.product_id
-           WHERE fe.user_id=?
+           JOIN products p ON p.id = fe.product_id
+           WHERE fe.user_id = ?
+             AND date(fe.entry_time) = ?
            ORDER BY fe.id DESC""",
-        (session["user_id"],)
+        (session["user_id"], selected_date.isoformat())
     ).fetchall()
     for r in rows:
         factor = r["quantity_g"] / 100.0
@@ -499,6 +539,8 @@ def food_entry():
         (session["user_id"],)
     ).fetchone()
     norm_cal = profile["target_cal"] or 0
+    # Русские краткие наименования дней недели для вывода в шаблоне
+    weekdays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
 
     return render_template(
         "food_entry.html",
@@ -507,7 +549,9 @@ def food_entry():
         totals=totals,
         norm_cal=norm_cal,
         history_data=history_data,
-        week_start=week_start.isoformat()
+        week_start=week_start.isoformat(),
+        selected_date=selected_date.isoformat(),
+        weekdays=weekdays
     )
 
 

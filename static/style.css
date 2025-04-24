@@ -1,17 +1,25 @@
 /* ------------------------- */
 /* Общие сбросы и базовые стили */
 /* ------------------------- */
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif;}
-body{background:#181818;color:#fff;min-height:100vh;}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+}
+body {
+  background: #181818;
+  color: #fff;
+  min-height: 100vh;
+}
 
-/* ── Align summary and mini‑summary columns with meal‑table columns ── */
+/* ── Выравнивание колонок summary и mini-summary с meal-table ── */
 .summary-table,
 .mini-summary-table,
 .meal-table {
   table-layout: fixed;
   width: 100%;
 }
-
 .summary-table th,
 .summary-table td,
 .mini-summary-table td,
@@ -19,10 +27,7 @@ body{background:#181818;color:#fff;min-height:100vh;}
 .meal-table td {
   padding: 6px 8px;
   font-size: 14px;
-  box-sizing: border-box;
 }
-
-/* Column widths and text alignment */
 .summary-table th:nth-child(1),
 .summary-table td:nth-child(1),
 .mini-summary-table td:nth-child(1),
@@ -31,7 +36,6 @@ body{background:#181818;color:#fff;min-height:100vh;}
   width: 40%;
   text-align: left;
 }
-
 .summary-table th:nth-child(2),
 .summary-table td:nth-child(2),
 .mini-summary-table td:nth-child(2),
@@ -40,7 +44,6 @@ body{background:#181818;color:#fff;min-height:100vh;}
   width: 12%;
   text-align: center;
 }
-
 .summary-table th:nth-child(3),
 .summary-table td:nth-child(3),
 .mini-summary-table td:nth-child(3),
@@ -49,7 +52,6 @@ body{background:#181818;color:#fff;min-height:100vh;}
   width: 12%;
   text-align: center;
 }
-
 .summary-table th:nth-child(4),
 .summary-table td:nth-child(4),
 .mini-summary-table td:nth-child(4),
@@ -58,7 +60,6 @@ body{background:#181818;color:#fff;min-height:100vh;}
   width: 12%;
   text-align: center;
 }
-
 .summary-table th:nth-child(5),
 .summary-table td:nth-child(5),
 .mini-summary-table td:nth-child(5),
@@ -67,7 +68,6 @@ body{background:#181818;color:#fff;min-height:100vh;}
   width: 12%;
   text-align: center;
 }
-
 .summary-table th:nth-child(6),
 .summary-table td:nth-child(6),
 .mini-summary-table td:nth-child(6),
@@ -76,150 +76,399 @@ body{background:#181818;color:#fff;min-height:100vh;}
   width: 12%;
   text-align: center;
 }
-
-/* Float the numeric values to the right edge of each cell */
+/* Числовые значения выравниваем вправо */
 .summary-table strong,
 .mini-summary-table strong {
   float: right;
 }
+
 /* ------------------------- */
 /* Формы (логин, регистрация, профиль) */
 /* ------------------------- */
-.container{
-  width:400px;margin:80px auto;padding:30px;
-  background:#232323;border-radius:12px;box-shadow:0 0 20px rgba(0,0,0,.5);
+.container {
+  width: 400px;
+  margin: 80px auto;
+  padding: 30px;
+  background: #232323;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0,0,0,.5);
 }
-h1{text-align:center;margin-bottom:24px;font-size:28px;font-weight:600;}
-label{display:block;margin:18px 0 6px;font-weight:500;color:#ccc;}
+h1 {
+  text-align: center;
+  margin-bottom: 24px;
+  font-size: 28px;
+  font-weight: 600;
+}
+label {
+  display: block;
+  margin: 18px 0 6px;
+  font-weight: 500;
+  color: #ccc;
+}
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+input[type="file"],
+select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #3a3a3a;
+  border-radius: 8px;
+  background: #2c2c2c;
+  color: #fff;
+  font-size: 14px;
+  transition: border-color .3s;
+}
+input:focus,
+select:focus {
+  border-color: #4CAF50;
+  outline: none;
+}
+select {
+  appearance: none;
+  background: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D'10'%20height%3D'6'%20viewBox%3D'0%200%2010%206'%20xmlns%3D'http://www.w3.org/2000/svg'%3E%3Cpath%20d%3D'M0%200l5%206%205-6z'%20fill%3D'%23ffffff'/%3E%3C/svg%3E")
+              no-repeat right 14px center;
+}
+input[type="file"]::file-selector-button {
+  padding: 8px 12px;
+  margin-right: 8px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg,#47BF21,#2CA02C);
+  color: #fff;
+  cursor: pointer;
+  transition: opacity .3s, transform .1s;
+}
+input[type="file"]::file-selector-button:hover { opacity:.9; }
+input[type="file"]::file-selector-button:active { transform:scale(.98); }
 
-input[type="text"],input[type="password"],input[type="email"],
-input[type="number"],input[type="file"],select{
-  width:100%;padding:12px 14px;border:1px solid #3a3a3a;
-  border-radius:8px;background:#2c2c2c;color:#fff;font-size:14px;
-  transition:border-color .3s;
-}
-input:focus,select:focus{border-color:#4CAF50;outline:none;}
-select{
-  appearance:none;
-  background:url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D'10'%20height%3D'6'%20viewBox%3D'0%200%2010%206'%20xmlns%3D'http://www.w3.org/2000/svg'%3E%3Cpath%20d='M0%200l5%206%205-6z'%20fill='%23ffffff'/%3E%3C/svg%3E")
-         no-repeat right 14px center;
-}
-input[type="file"]::file-selector-button{
-  padding:8px 12px;margin-right:8px;border:none;border-radius:8px;
-  background:linear-gradient(135deg,#47BF21,#2CA02C);color:#fff;cursor:pointer;
-  transition:opacity .3s,transform .1s;
-}
-input[type="file"]::file-selector-button:hover{opacity:.9;}
-input[type="file"]::file-selector-button:active{transform:scale(.98);}
-
+/* ------------------------- */
 /* Кнопки */
-button{
-  width:100%;padding:14px 0;margin-top:20px;border:none;border-radius:8px;
-  font-size:16px;cursor:pointer;
-  background:linear-gradient(135deg,#47BF21,#2CA02C);color:#fff;
-  transition:opacity .3s,transform .1s;
+/* ------------------------- */
+button {
+  width: 100%;
+  padding: 14px 0;
+  margin-top: 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  background: linear-gradient(135deg,#47BF21,#2CA02C);
+  color: #fff;
+  transition: opacity .3s, transform .1s;
 }
-button:hover{opacity:.9;}button:active{transform:scale(.98);}
-button.reg-btn{background:linear-gradient(135deg,#3E6AE1,#3AA4E1);}
-button.logout-btn{background:linear-gradient(135deg,#E14747,#E12C2C);}
+button:hover { opacity:.9; }
+button:active { transform:scale(.98); }
+button.reg-btn { background: linear-gradient(135deg,#3E6AE1,#3AA4E1); }
+button.logout-btn { background: linear-gradient(135deg,#E14747,#E12C2C); }
 
 /* ------------------------- */
 /* Общие интерактивные блоки */
 /* ------------------------- */
-.block{
-  background:#232323;border-radius:12px;padding:20px;
-  box-shadow:0 0 10px rgba(0,0,0,.5);
-  cursor:pointer;transition:background .3s,transform .2s;
-  display:flex;flex-direction:column;justify-content:flex-start;
+.block {
+  background: #232323;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0,0,0,.5);
+  cursor: pointer;
+  transition: background .3s, transform .2s;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 }
-.block:hover{background:#2c2c2c;transform:scale(1.01);}
-.block h3{margin:0 0 20px;font-size:18px;text-align:center;}
+.block:hover {
+  background: #2c2c2c;
+  transform: scale(1.01);
+}
+.block h3 {
+  margin: 0 0 20px;
+  font-size: 18px;
+  text-align: center;
+}
 
 /* ------------------------- */
-/* Дашборд                   */
+/* Дашборд (main.html)       */
 /* ------------------------- */
-.dashboard-container{
-  display:grid;grid-template-columns:250px 1fr minmax(120px,180px);
-  height:100vh;gap:20px;padding:20px;
+.dashboard-container {
+  display: grid;
+  grid-template-columns: 250px 1fr minmax(120px,180px);
+  height: 100vh;
+  gap: 20px;
+  padding: 20px;
 }
-.sidebar-dashboard{
-  background:#1f1f1f;border-radius:10px;padding:20px;
-  display:flex;flex-direction:column;align-items:center;gap:20px;
+.sidebar-dashboard {
+  background: #1f1f1f;
+  border-radius: 10px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
 }
-.sidebar-dashboard .sidebar-logo h2{font-size:24px;color:#fff;cursor:pointer;}
-.profile-photo{width:150px;height:150px;background:#2a2a2a;border-radius:50%;}
-.profile-photo img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
-.sidebar-dashboard .profile-fields{display:flex;flex-direction:column;gap:12px;width:100%;}
-.center-area{display:flex;flex-direction:column;gap:20px;height:100%;}
-.diet-constructor{flex:1;display:flex;justify-content:center;align-items:center;}
-
-.weekly-calories{flex:.9;display:flex;flex-direction:column;}
+.sidebar-dashboard .sidebar-logo h2 {
+  font-size:24px;
+  color:#fff;
+  cursor:pointer;
+}
+.profile-photo {
+  width:150px;
+  height:150px;
+  background:#2a2a2a;
+  border-radius:50%;
+}
+.profile-photo img {
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  border-radius:50%;
+}
+.sidebar-dashboard .profile-fields {
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  width:100%;
+}
+.center-area {
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+  height:100%;
+}
+.diet-constructor {
+  flex:1;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+.weekly-calories {
+  flex:.9;
+  display:flex;
+  flex-direction:column;
+}
+/* обновлено: weekly calories bar chart */
 .weekly-calories .chart-bar{
-  flex:1;width:100%;background:#2a2a2a;border-radius:10px;
-  display:flex;align-items:center;justify-content:center;
+  flex:1;
+  width:100%;
+  background:#2a2a2a;
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:10px 0;
 }
-.right-col{display:flex;flex-direction:column;gap:20px;height:100%;}
-.right-col .daily-calories,.right-col .product-db{
-  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+.weekly-calories canvas{
+  width:90%;
+  height:100%;
 }
-.chart-circle{
-  width:150px;height:150px;background:#2a2a2a;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
+.right-col {
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+  height:100%;
 }
-.chart-placeholder{color:#777;font-size:14px;}
+.right-col .daily-calories,
+.right-col .product-db {
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+}
+.chart-circle {
+  width:150px;
+  height:150px;
+  background:#2a2a2a;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.chart-placeholder {
+  color:#777;
+  font-size:14px;
+}
 
 /* ------------------------- */
 /* Приём пищи                */
 /* ------------------------- */
-.food-entry-container{
-  display:grid;grid-template-columns:200px 1fr;grid-template-rows:auto 1fr;
-  height:100vh;gap:20px;padding:20px;
+.food-entry-container {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  grid-template-rows: auto 1fr;
+  height: 100vh;
+  gap: 20px;
+  padding: 20px;
 }
 
-/* ── тулбар с дневной сводкой ── */
-.toolbar{
-  grid-column:2/3;display:flex;align-items:center;height:50px;
-  background:#232323;border-radius:12px;padding:0 20px;
-  box-shadow:0 0 10px rgba(0,0,0,.5);
+/* тулбар: суммарно за день */
+.toolbar {
+  grid-column: 2 / 3;
+  display: flex;
+  align-items: center;
+  min-height: 60px;
+  background: #232323;
+  border-radius: 12px;
+  padding: 8px 20px;
+  box-shadow: 0 0 10px rgba(0,0,0,.5);
 }
-.summary-table{width:100%;table-layout:fixed;border-collapse:collapse;}
-.summary-table th,
-.summary-table td {
-  font-size:14px;
-  padding:6px 8px;
-}
-  .summary-table th:nth-child(1),
-  .summary-table td:nth-child(1) { width: 40%; text-align: left; }
-  .summary-table th:nth-child(2),
-  .summary-table td:nth-child(2) { width: 12%; text-align: left; }
-  .summary-table th:nth-child(3),
-  .summary-table td:nth-child(3) { width: 12%; text-align: left; }
-  .summary-table th:nth-child(4),
-  .summary-table td:nth-child(4) { width: 12%; text-align: left; }
-  .summary-table th:nth-child(5),
-  .summary-table td:nth-child(5) { width: 12%; text-align: left; }
-  .summary-table th:nth-child(6),
-  .summary-table td:nth-child(6) { width: 12%; text-align: left; }
-.summary-table strong{float:right;}
 
-/* ── левая панель ── */
-.left-panel{grid-column:1/2;grid-row:1/3;display:flex;flex-direction:column;}
-.left-chart{
-  flex:1;background:#232323;border-radius:12px;padding:20px;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  box-shadow:0 0 10px rgba(0,0,0,.5);cursor:default;
+/* make summary table flex to align columns under meal panels */
+.toolbar .summary-table {
+  flex: 1;
 }
-.left-chart:hover{background:#232323;transform:none;}
-.left-chart h3{margin-bottom:15px;}
-.left-chart .back-btn{
-  margin-top:20px;padding:8px 16px;border:none;border-radius:8px;
-  background:linear-gradient(135deg,#47BF21,#2CA02C);color:#fff;cursor:pointer;
-  transition:opacity .3s,transform .1s;
-}
-.left-chart .back-btn:hover{opacity:.9;}
-.left-chart .back-btn:active{transform:scale(.98);}
 
-/* Three meal panels: vertical stack; only clicked panel expands */
+/* ── история внутри тулбара ── */
+.toolbar {
+  display: flex;
+  align-items: center;
+}
+.toolbar .history-container {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-right: 20px;
+}
+.toolbar .history-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.toolbar .history-header h3 {
+  margin: 0;
+  font-size: 16px;
+}
+.toolbar .history-header #week-picker {
+  padding: 6px 8px;
+  border: 1px solid #3a3a3a;
+  border-radius: 6px;
+  background: #2c2c2c;
+  color: #fff;
+}
+.toolbar .history-items {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.toolbar .history-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 48px;
+  margin-top: 2px;
+  cursor:pointer;
+}
+.toolbar .history-item.active .history-chart{
+  outline:2px solid #47BF21;
+}
+.toolbar .history-chart {
+  display: block;
+  width: 32px;
+  height: 32px;
+  margin-bottom: 2px;
+}
+.toolbar .history-label {
+  font-size: 12px;
+}
+
+/* сводка за день */
+.summary-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.summary-table td,
+.summary-table th {
+  font-size: 14px;
+  padding: 6px 8px;
+}
+.summary-table th:nth-child(1),
+.summary-table td:nth-child(1) { width: 40%; text-align: left; }
+.summary-table th:nth-child(2),
+.summary-table td:nth-child(2) { width: 12%; text-align: center; }
+.summary-table th:nth-child(n+3),
+.summary-table td:nth-child(n+3) { width: 12%; text-align: center; }
+
+/* левая панель */
+.left-panel {
+  grid-column: 1 / 2;
+  grid-row: 1 / 3;
+  display: flex;
+  flex-direction: column;
+}
+.left-chart {
+  flex: 1;
+  padding: 20px;
+  background: #232323;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0,0,0,.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* история недели внутри панели "Калории за день" */
+/*
+.left-chart .history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 12px;
+}
+.left-chart .history-header h3 {
+  margin: 0;
+  font-size: 16px;
+}
+.left-chart .history-header #week-picker {
+  padding: 6px 8px;
+  border: 1px solid #3a3a3a;
+  border-radius: 6px;
+  background: #2c2c2c;
+  color: #fff;
+}
+.left-chart .history-items {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  width: 100%;
+  margin-bottom: 12px;
+}
+.left-chart .history-item {
+  flex: 1;
+  min-width: 80px;
+  background: #2a2a2a;
+  border-radius: 8px;
+  padding: 8px;
+  text-align: center;
+}
+.left-chart .history-day {
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+.left-chart .history-cals {
+  font-size: 16px;
+  font-weight: 600;
+}
+.left-chart .history-chart {
+  display: block;
+  margin-bottom: 4px;
+}
+.left-chart .history-label {
+  font-size: 12px;
+  color: #fff;
+}
+*/
+
+/* кнопки в левой панели */
+.left-chart .back-btn {
+  width: auto;
+  padding: 8px 16px;
+  margin-top: 12px;
+}
+
+/* три панели приёмов пищи */
 .entry-content {
   grid-column: 2 / 3;
   grid-row: 2 / 3;
@@ -228,103 +477,194 @@ button.logout-btn{background:linear-gradient(135deg,#E14747,#E12C2C);}
   gap: 20px;
   height: 100%;
 }
-.meal-panel{
+.meal-panel {
   flex: 1;
-  background:#232323;border-radius:12px;padding:20px;
-  box-shadow:0 0 10px rgba(0,0,0,.5);
-  display:flex;flex-direction:column;
-  transition:background .3s,transform .2s;
+  background: #232323;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0,0,0,.5);
+  display: flex;
+  flex-direction: column;
+  transition: background .3s, transform .2s;
 }
-.meal-panel:hover{background:#2c2c2c;transform:scale(1.01);}
-.meal-header h3{margin:0;font-size:18px;}
-.meal-body{max-height:120px;overflow-y:auto;transition:max-height .35s ease;margin-top:12px;}
-.meal-panel.open .meal-body{max-height:800px;}
-
-/* кнопки удаления — только в раскрытой панели */
-.meal-panel .del-btn{display:none;}
-.meal-panel.open .del-btn{display:inline-block;}
-
-/* мини‑сводки в приёмах */
-.mini-summary-table{width:100%;table-layout:fixed;border-collapse:collapse;margin-bottom:8px;}
-.mini-summary-table td{
-  font-size:14px;padding:6px 8px;text-align:left;
+.meal-panel:hover {
+  background: #2c2c2c;
+  transform: scale(1.01);
 }
-.mini-summary-table td:nth-child(1){width:40%; text-align: left;}
-.mini-summary-table td:nth-child(2){width:12%; text-align: center;}
-  .mini-summary-table td:nth-child(3) { width: 12%; text-align: center; }
-  .mini-summary-table td:nth-child(4) { width: 12%; text-align: center; }
-  .mini-summary-table td:nth-child(5) { width: 12%; text-align: center; }
-  .mini-summary-table td:nth-child(6) { width: 12%; text-align: center; }
-.mini-summary-table strong{float:right;}
+.meal-header h3 {
+  margin: 0;
+  font-size: 18px;
+}
+.meal-body {
+  margin-top: 12px;
+  overflow-y: auto;
+  max-height: 120px;
+  transition: max-height .35s ease;
+}
+.meal-panel.open .meal-body {
+  max-height: 800px;
+}
+
+/* кнопки удаления показываем только при раскрытом */
+.meal-panel .del-btn {
+  display: none;
+}
+.meal-panel.open .del-btn {
+  display: inline-block;
+}
+
+/* мини-сводки внутри панелей */
+.mini-summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 8px;
+}
+.mini-summary-table td {
+  font-size: 14px;
+  padding: 6px 8px;
+  text-align: left;
+}
+.mini-summary-table td:nth-child(1) { width: 40%; }
+.mini-summary-table td:nth-child(2) { width: 12%; text-align: center; }
+.mini-summary-table td:nth-child(n+3) { width: 12%; text-align: center; }
+.mini-summary-table strong {
+  float: right;
+}
 
 /* таблица продуктов */
-.meal-table{width:100%;table-layout:fixed;border-collapse:collapse;}
-.meal-table th:nth-child(1),.meal-table td:nth-child(1){width:40%;text-align:left;}
-.meal-table th:nth-child(2),.meal-table td:nth-child(2){width:12%;}
- .meal-table th:nth-child(3), .meal-table td:nth-child(3) { width:12%; text-align:center; }
- .meal-table th:nth-child(4), .meal-table td:nth-child(4) { width:12%; text-align:center; }
- .meal-table th:nth-child(5), .meal-table td:nth-child(5) { width:12%; text-align:center; }
- .meal-table th:nth-child(6), .meal-table td:nth-child(6) { width:12%; text-align:center; }
-.meal-table th,.meal-table td{
-  padding:6px 8px;border-bottom:1px solid #3a3a3a;
-  font-size:14px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+.meal-table {
+  width: 100%;
+  border-collapse: collapse;
 }
-.meal-table th{font-weight:600;}
-.del-btn{
-  padding:2px 8px;border:none;border-radius:6px;
-  background:#E14747;color:#fff;cursor:pointer;transition:opacity .2s;
+.meal-table th:nth-child(1),
+.meal-table td:nth-child(1) { width: 40%; text-align: left; }
+.meal-table th:nth-child(2),
+.meal-table td:nth-child(2) { width: 12%; }
+.meal-table th:nth-child(n+3),
+.meal-table td:nth-child(n+3) { width: 12%; text-align: center; }
+.meal-table th,
+.meal-table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid #3a3a3a;
+  font-size: 14px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.del-btn:hover{opacity:.85;}
-.empty{color:#aaa;font-size:14px;text-align:center;margin-top:8px;}
+.meal-table th {
+  font-weight: 600;
+}
+.del-btn {
+  padding: 2px 8px;
+  border: none;
+  border-radius: 6px;
+  background: #E14747;
+  color: #fff;
+  cursor: pointer;
+  transition: opacity .2s;
+}
+.del-btn:hover {
+  opacity: .85;
+}
+.empty {
+  color: #aaa;
+  font-size: 14px;
+  text-align: center;
+  margin-top: 8px;
+}
 
 /* ------------------------- */
 /* База продуктов            */
 /* ------------------------- */
-.product-list{display:flex;flex-direction:column;gap:12px;max-height:60vh;overflow-y:auto;}
-.product-item{
-  background:#232323;border-radius:10px;padding:16px;
-  box-shadow:0 0 10px rgba(0,0,0,.5);cursor:pointer;
-  transition:background .3s,transform .2s;
+.product-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 60vh;
+  overflow-y: auto;
 }
-.product-item:hover{background:#2c2c2c;transform:scale(1.01);}
-.product-item h3{margin:0 0 8px;font-size:16px;}
-.product-item p{margin:0;font-size:14px;color:#ccc;}
-
-.edit-area{margin-top:10px;display:flex;flex-direction:column;gap:8px;}
-.qty-input{
-  width:90px;padding:6px 8px;border:1px solid #3a3a3a;border-radius:6px;
-  background:#2c2c2c;color:#fff;
+.product-item {
+  background: #232323;
+  border-radius: 10px;
+  padding: 16px;
+  box-shadow: 0 0 10px rgba(0,0,0,.5);
+  cursor: pointer;
+  transition: background .3s, transform .2s;
 }
-.meal-buttons button{
-  padding:6px 12px;margin-right:6px;border:none;border-radius:8px;
-  background:linear-gradient(135deg,#3E6AE1,#3AA4E1);color:#fff;cursor:pointer;
-  transition:opacity .3s,transform .1s;
+.product-item:hover {
+  background: #2c2c2c;
+  transform: scale(1.01);
 }
-.meal-buttons button:hover{opacity:.9;} .meal-buttons button:active{transform:scale(.98);}
+.product-item h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+}
+.product-item p {
+  margin: 0;
+  font-size: 14px;
+  color: #ccc;
+}
 
 /* ------------------------- */
 /* Спиннеры / сообщения      */
 /* ------------------------- */
-.spinner{
-  width:40px;height:40px;border:4px solid rgba(255,255,255,.1);
-  border-top:4px solid #47BF21;border-radius:50%;
-  margin:20px auto;animation:spin 1s linear infinite;
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(255,255,255,.1);
+  border-top: 4px solid #47BF21;
+  border-radius: 50%;
+  margin: 20px auto;
+  animation: spin 1s linear infinite;
 }
-@keyframes spin{to{transform:rotate(360deg);}}
-.error{color:#E14747;text-align:center;margin-top:10px;font-size:14px;}
-.info {color:#aaa;text-align:center;margin-top:10px;font-size:14px;}
-
-/* Круговой график калорий за день */
-.daily-chart-container {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 10px;
-}
-#daily-chart {
-}
-.chart-text {
-  width: 100%;
+@keyframes spin { to { transform: rotate(360deg); } }
+.error {
+  color: #E14747;
   text-align: center;
+  margin-top: 10px;
   font-size: 14px;
-  margin: 0 auto;
 }
+.info {
+  color: #aaa;
+  text-align: center;
+  margin-top: 10px;
+  font-size: 14px;
+}
+/* ... существующий код выше ... */
+
+/* история недели внутри панели "Калории за день" */
+.left-chart .history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 12px;
+}
+.left-chart .history-items {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  width: 100%;
+  margin-bottom: 12px;
+}
+.left-chart .history-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  min-width: 60px;
+  background: #2a2a2a;
+  border-radius: 8px;
+  padding: 8px;
+}
+.left-chart .history-chart {
+  display: block;
+  margin-bottom: 4px;
+}
+.left-chart .history-label {
+  font-size: 12px;
+  color: #fff;
+}
+
+/* ... остальной код ниже ... */

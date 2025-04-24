@@ -9,165 +9,319 @@
 <body>
 <main class="food-entry-container">
 
-  <!-- ── тулбар: суммарно за день ── -->
+  <!-- ── тулбар: суммарно за день + история внутри него ── -->
   <header class="toolbar">
+    {# Список сокращённых дней недели для подписей #}
+    {% set weekdays = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'] %}
+    <div class="history-container">
+      <div class="history-header">
+        <input type="date" id="week-picker" value="{{ week_start }}" style="display:inline-block;">
+      </div>
+      <div class="history-items">
+        {% for day in history_data %}
+        <div class="history-item selectable-day {% if day.date == selected_date %}active{% endif %}"
+             data-date="{{ day.date }}" data-calories="{{ day.calories }}">
+          <canvas class="history-chart" width="40" height="40"></canvas>
+          <div class="history-label">{{ weekdays[loop.index0] }}</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
     <table class="summary-table">
-      <tr>
-        <td></td>  <!-- продукт -->
-        <td></td>  <!-- qty -->
-        <td>Ккал <strong>{{ totals.kcal }}</strong></td>
-        <td>Б, г <strong>{{ totals.protein }}</strong></td>
-        <td>Ж, г <strong>{{ totals.fat }}</strong></td>
-        <td>У, г <strong>{{ totals.carbs }}</strong></td>
-      </tr>
+      <thead>
+        <tr>
+          <th></th><th></th>
+          <th>Ккал</th>
+          <th>Б, г</th>
+          <th>Ж, г</th>
+          <th>У, г</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td></td><td></td>
+          <td><strong>{{ '%.1f' % totals.kcal }}</strong></td>
+          <td><strong>{{ '%.1f' % totals.protein }}</strong></td>
+          <td><strong>{{ '%.1f' % totals.fat }}</strong></td>
+          <td><strong>{{ '%.1f' % totals.carbs }}</strong></td>
+        </tr>
+      </tbody>
     </table>
   </header>
 
-  <!-- левая панель -->
+
+  <!-- Левая панель -->
   <aside class="left-panel">
-    <div class="block left-chart">
+    <div class="left-chart">
       <h3>Калории за день</h3>
-      <div class="daily-chart-container">
-        <canvas id="daily-chart" width="180" height="180"></canvas>
-      </div>
-          <!-- Новые строки под графиком -->
-    <p class="chart-text">Потреблено: <strong>{{ totals.kcal }}</strong> Ккал</p>
-    <p class="chart-text">Цель: <strong>{{ norm_cal }}</strong> Ккал</p>
-      <!-- Новая кнопка добавления продукта -->
-    <button class="back-btn"
-            onclick="window.location='{{ url_for('product_db', next='food_entry') }}';">
-      Добавить продукт
-    </button>
-      <button class="back-btn" onclick="location='{{ url_for('main') }}'">Назад</button>
+      <canvas id="daily-chart" width="150" height="150"></canvas>
+      <p class="chart-text">Потреблено: <strong>{{ totals.kcal }}</strong> Ккал</p>
+      <p class="chart-text">Цель: <strong>{{ norm_cal }}</strong> Ккал</p>
+      <button class="back-btn"
+        onclick="location='{{ url_for('product_db', next='food_entry', day=selected_date) }}'">
+  Добавить продукт
+</button>
+      <form action="{{ url_for('main') }}" method="get">
+
+        <button class="back-btn" type="submit">Назад</button>
+      </form>
     </div>
   </aside>
 
-  <!-- три приёма пищи -->
+  <!-- Три панели приёмов пищи -->
   <section class="entry-content">
-    {% for idx in (1,2,3) %}
-    <section class="panel meal-panel{% if not meals[idx] %} empty-panel{% endif %}" data-meal="{{ idx }}">
-
-      <header class="meal-header"><h3>Приём №{{ idx }}</h3></header>
-
+    <!-- Завтрак -->
+    <div class="meal-panel open">
+      <div class="meal-header">
+        <h3>Завтрак</h3>
+      </div>
       <div class="meal-body">
-
-        <!-- мини‑сводка -->
-        <table class="mini-summary-table">
-          <tr>
-            <td></td><td></td>
-            <td>Ккал <strong>{{ meal_sums[idx].kcal }}</strong></td>
-            <td>Б <strong>{{ meal_sums[idx].protein }}</strong></td>
-            <td>Ж <strong>{{ meal_sums[idx].fat }}</strong></td>
-            <td>У <strong>{{ meal_sums[idx].carbs }}</strong></td>
-          </tr>
-        </table>
-
-        {% if meals[idx] %}
         <table class="meal-table">
           <thead>
             <tr>
-              <th>Продукт</th><th>Кол‑во, г</th><th>Ккал</th>
-              <th>Б, г</th><th>Ж, г</th><th>У, г</th><th style="width:10%"></th>
+              <th>Продукт</th>
+              <th>Грамм</th>
+              <th>Ккал</th>
+              <th>Б</th>
+              <th>Ж</th>
+              <th>У</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
-            {% for row in meals[idx] %}
-            <tr data-entry="{{ row.id }}">
-              <td>{{ row.name }}</td>
-              <td>{{ row.qty }}</td>
-              <td>{{ row.kcal }}</td>
-              <td>{{ row.protein }}</td>
-              <td>{{ row.fat }}</td>
-              <td>{{ row.carbs }}</td>
-              <td><button class="del-btn">✕</button></td>
+            {% for item in meals[1] %}
+            <tr data-entry="{{ item.id }}">
+              <td>{{ item.name }}</td>
+              <td>{{ item.qty }}</td>
+              <td>{{ '%.1f' % item.kcal }}</td>
+              <td>{{ '%.1f' % item.protein }}</td>
+              <td>{{ '%.1f' % item.fat }}</td>
+              <td>{{ '%.1f' % item.carbs }}</td>
+              <td><button class="del-btn" type="button">✕</button></td>
             </tr>
+            {% else %}
+            <tr><td colspan="7" class="empty">Нет записей</td></tr>
             {% endfor %}
           </tbody>
+          <tfoot>
+            <tr>
+              <td></td><td></td>
+              <td><strong>{{ '%.1f' % meal_sums[1].kcal }}</strong></td>
+              <td><strong>{{ '%.1f' % meal_sums[1].protein }}</strong></td>
+              <td><strong>{{ '%.1f' % meal_sums[1].fat }}</strong></td>
+              <td><strong>{{ '%.1f' % meal_sums[1].carbs }}</strong></td>
+              <td></td>
+            </tr>
+          </tfoot>
         </table>
-        {% else %}
-          <p class="empty">Нет продуктов</p>
-        {% endif %}
       </div>
-    </section>
-    {% endfor %}
+    </div>
+    <!-- Обед -->
+    <div class="meal-panel">
+      <div class="meal-header">
+        <h3>Обед</h3>
+      </div>
+      <div class="meal-body">
+        <table class="meal-table">
+          <thead>
+            <tr>
+              <th>Продукт</th>
+              <th>Грамм</th>
+              <th>Ккал</th>
+              <th>Б</th>
+              <th>Ж</th>
+              <th>У</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in meals[2] %}
+            <tr data-entry="{{ item.id }}">
+              <td>{{ item.name }}</td>
+              <td>{{ item.qty }}</td>
+              <td>{{ '%.1f' % item.kcal }}</td>
+              <td>{{ '%.1f' % item.protein }}</td>
+              <td>{{ '%.1f' % item.fat }}</td>
+              <td>{{ '%.1f' % item.carbs }}</td>
+              <td><button class="del-btn" type="button">✕</button></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="7" class="empty">Нет записей</td></tr>
+            {% endfor %}
+          </tbody>
+          <tfoot>
+            <tr>
+              <td></td><td></td>
+              <td><strong>{{ '%.1f' % meal_sums[2].kcal }}</strong></td>
+              <td><strong>{{ '%.1f' % meal_sums[2].protein }}</strong></td>
+              <td><strong>{{ '%.1f' % meal_sums[2].fat }}</strong></td>
+              <td><strong>{{ '%.1f' % meal_sums[2].carbs }}</strong></td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+    <!-- Ужин -->
+    <div class="meal-panel">
+      <div class="meal-header">
+        <h3>Ужин</h3>
+      </div>
+      <div class="meal-body">
+        <table class="meal-table">
+          <thead>
+            <tr>
+              <th>Продукт</th>
+              <th>Грамм</th>
+              <th>Ккал</th>
+              <th>Б</th>
+              <th>Ж</th>
+              <th>У</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in meals[3] %}
+            <tr data-entry="{{ item.id }}">
+              <td>{{ item.name }}</td>
+              <td>{{ item.qty }}</td>
+              <td>{{ '%.1f' % item.kcal }}</td>
+              <td>{{ '%.1f' % item.protein }}</td>
+              <td>{{ '%.1f' % item.fat }}</td>
+              <td>{{ '%.1f' % item.carbs }}</td>
+              <td><button class="del-btn" type="button">✕</button></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="7" class="empty">Нет записей</td></tr>
+            {% endfor %}
+          </tbody>
+          <tfoot>
+            <tr>
+              <td></td><td></td>
+              <td><strong>{{ '%.1f' % meal_sums[3].kcal }}</strong></td>
+              <td><strong>{{ '%.1f' % meal_sums[3].protein }}</strong></td>
+              <td><strong>{{ '%.1f' % meal_sums[3].fat }}</strong></td>
+              <td><strong>{{ '%.1f' % meal_sums[3].carbs }}</strong></td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
   </section>
+
 </main>
 
+<!-- переключение недели -->
 <script>
-  // Toggle only the clicked meal panel (and handle deletes)
+  document.getElementById('week-picker').addEventListener('change', e => {
+    window.location = `{{ url_for('food_entry') }}?week_start=${e.target.value}`;
+  });
+</script>
+
+<!-- разворачивание панелей и удаление -->
+<script>
   const container = document.querySelector('.entry-content');
   container.addEventListener('click', e => {
-    // If delete button clicked, handle removal
     if (e.target.classList.contains('del-btn')) {
       e.stopPropagation();
       const row = e.target.closest('tr');
       fetch('/delete-food', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
         body: JSON.stringify({id: row.dataset.entry})
       })
-      .then(r => r.json())
-      .then(d => { if (d.ok) window.location.reload(); })
-      .catch(console.error);
+      .then(r=>r.json()).then(d=>d.ok && window.location.reload());
       return;
     }
-    // Toggle panel only if click happened inside it (not delete)
     const panel = e.target.closest('.meal-panel');
-    if (panel) {
-      panel.classList.toggle('open');
-    }
+    if (panel) panel.classList.toggle('open');
   });
 </script>
+
+<!-- круговая диаграмма «за день» (большая) -->
 <script>
-  (function() {
-    const consumed = {{ totals.kcal }};
-    const norm = {{ norm_cal }};
+  (function(){
+    const consumed = {{ totals.kcal }}, norm = {{ norm_cal }};
     const canvas = document.getElementById('daily-chart');
     if (!canvas || !norm) return;
-    // High-DPI support
-    const dpr = window.devicePixelRatio || 1;
-    const size = canvas.clientWidth;
-    canvas.width = size * dpr;
-    canvas.height = size * dpr;
-    canvas.style.width = size + 'px';
-    canvas.style.height = size + 'px';
+    const dpr = window.devicePixelRatio||1,
+          size = canvas.clientWidth;
+    canvas.width = canvas.height = size * dpr;
+    canvas.style.width = canvas.style.height = size+'px';
     const ctx = canvas.getContext('2d');
-    ctx.scale(dpr, dpr);
-    const center = size / 2;
-    const trackWidth = 16;
-    const ringWidth = 16;
-    const overflowWidth = 12;
-    // Radii
-    const trackRadius = center - trackWidth;
-    const ringRadius = center - trackWidth;
-    const overflowRadius = center - trackWidth - ringWidth - 4;
-    // Draw background track
-    ctx.lineWidth = trackWidth;
+    ctx.scale(dpr,dpr);
+    const c = size/2, track=16, ring=16, overflow=12;
+    // фон
+    ctx.lineWidth = track;
     ctx.strokeStyle = 'rgba(100,100,100,0.2)';
     ctx.beginPath();
-    ctx.arc(center, center, trackRadius, 0, 2 * Math.PI, false);
+    ctx.arc(c,c,c-track,0,2*Math.PI);
     ctx.stroke();
-    // Draw main ring
-    const ratio = Math.min(consumed / norm, 1);
-    const start = -0.5 * Math.PI;
-    const end = start + ratio * 2 * Math.PI;
-    ctx.lineWidth = ringWidth;
+    // заполненный круг
+    const ratio = Math.min(consumed/norm,1),
+          start = -0.5*Math.PI,
+          end   = start + ratio*2*Math.PI;
+    ctx.lineWidth = ring;
     ctx.strokeStyle = '#47BF21';
     ctx.lineCap = 'round';
     ctx.beginPath();
-    ctx.arc(center, center, ringRadius, start, end, false);
+    ctx.arc(c,c,c-track,start,end);
     ctx.stroke();
-    // Draw overflow ring if any
-    if (consumed > norm) {
-      const over = Math.min((consumed - norm) / norm, 1);
-      const overEnd = start + over * 2 * Math.PI;
-      ctx.lineWidth = overflowWidth;
+    // превышение
+    if (consumed>norm) {
+      const over = Math.min((consumed-norm)/norm,1),
+            overEnd = start + over*2*Math.PI;
+      ctx.lineWidth = overflow;
       ctx.strokeStyle = '#E14747';
       ctx.beginPath();
-      ctx.arc(center, center, overflowRadius, start, overEnd, false);
+      ctx.arc(c,c,c-track-ring-4,start,overEnd);
       ctx.stroke();
     }
   })();
+</script>
+
+<!-- мини-диаграммы недели -->
+<script>
+  (function(){
+    const norm = {{ norm_cal }};
+    document.querySelectorAll('.history-chart').forEach((canvas,i)=>{
+      const calories = +canvas.parentElement.dataset.calories;
+      const size = canvas.clientWidth;
+      const dpr = window.devicePixelRatio||1;
+      canvas.width = canvas.height = size * dpr;
+      canvas.style.width = canvas.style.height = size+'px';
+      const ctx = canvas.getContext('2d');
+      ctx.scale(dpr,dpr);
+      const c = size/2, tw=4, rw=4;
+      // фон
+      ctx.lineWidth = tw;
+      ctx.strokeStyle = 'rgba(100,100,100,0.2)';
+      ctx.beginPath();
+      ctx.arc(c,c,c-tw,0,2*Math.PI);
+      ctx.stroke();
+      // заполнение
+      const ratio = norm>0 ? Math.min(calories/norm,1) : 0;
+      const start = -0.5*Math.PI,
+            end   = start + ratio*2*Math.PI;
+      ctx.lineWidth = rw;
+      ctx.strokeStyle = '#47BF21';
+      ctx.beginPath();
+      ctx.arc(c,c,c-tw,start,end);
+      ctx.stroke();
+    });
+  })();
+</script>
+<script>
+  document.querySelectorAll('.selectable-day').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const d = el.dataset.date;
+      const qs = new URLSearchParams(window.location.search);
+      qs.set('day', d);
+      // keep current week_start param
+      window.location = `{{ url_for('food_entry') }}?${qs.toString()}`;
+    });
+  });
 </script>
 </body>
 </html>

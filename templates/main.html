@@ -64,7 +64,7 @@
            onclick="window.location='{{ url_for('food_entry') }}';">
         <h3>Ккал за неделю</h3>
         <div class="chart-bar">
-          <span class="chart-placeholder">Bar Chart</span>
+          <canvas id="week-chart" width="260" height="140"></canvas>
         </div>
       </div>
     </section>
@@ -136,6 +136,41 @@
         ctx.arc(center, center, overflowRadius, start, overEnd, false);
         ctx.stroke();
       }
+    })();
+  </script>
+  <script>
+    (function () {
+      const data = {{ week_cals }};
+      const canvas = document.getElementById('week-chart');
+      if (!canvas) return;
+      const dpr = window.devicePixelRatio || 1;
+      const w = canvas.clientWidth || 260,
+            h = canvas.clientHeight || 140;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      const ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
+
+      const max = Math.max(...data, 1);
+      const barW = (w - 40) / 7;          // padding 20px left/right
+      const colors = '#47BF21';
+      ctx.fillStyle = colors;
+
+      data.forEach((val, i) => {
+        const x = 20 + i * barW;
+        const bh = (val / max) * (h - 30); // leave top padding
+        ctx.fillRect(x, h - bh - 10, barW * 0.6, bh); // 0.6 => gap between bars
+      });
+
+      // day labels (Пн‑Вс)
+      const lbls = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+      ctx.fillStyle = '#bbb';
+      ctx.font = '10px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      lbls.forEach((l,i)=>{
+        const x = 20 + i * barW + (barW*0.6)/2;
+        ctx.fillText(l, x, h-2);
+      });
     })();
   </script>
 </body>

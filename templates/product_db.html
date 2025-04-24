@@ -10,10 +10,15 @@
   <div class="container">
     <h1>База продуктов</h1>
 
+    {# ——— дата выбранного дня (если пришли из food-entry) ——— #}
+    {% set sel_day = request.args.get('day', '') %}
+
     <!-- Поисковая форма -->
-    <form method="post" action="{{ url_for('product_db', next=next) }}">
+    <form method="post"
+          action="{{ url_for('product_db', next=next, day=sel_day) }}">
       <input type="hidden" name="next" value="{{ next }}">
-      <input type="text" name="query"
+      <input type="hidden" name="day"  value="{{ sel_day }}">
+      <input type="text"   name="query"
              placeholder="Поиск продукта"
              value="{{ query or '' }}" required>
       <button type="submit">Искать</button>
@@ -43,12 +48,12 @@
           <p>
             {{ p.per }}:
             Ккал {{ p.kcal or "—" }},
-            Б {{ p.protein or "—" }} г,
-            Ж {{ p.fat or "—" }} г,
-            У {{ p.carbs or "—" }} г
+            Б {{ p.protein or "—" }} г,
+            Ж {{ p.fat or "—" }} г,
+            У {{ p.carbs or "—" }} г
           </p>
 
-          <!-- Скрытая зона редактирования -->
+          <!-- скрытая зона редактирования -->
           <div class="edit-area" style="display:none;">
             <div>
               <input type="number" min="1" value="100" class="qty-input"> г
@@ -58,15 +63,15 @@
               Ккал: <span class="m-kcal"></span>
             </div>
             <div class="macro">
-              Б: <span class="m-protein"></span> г,
-              Ж: <span class="m-fat"></span> г,
-              У: <span class="m-carbs"></span> г
+              Б: <span class="m-protein"></span> г,
+              Ж: <span class="m-fat"></span> г,
+              У: <span class="m-carbs"></span> г
             </div>
 
             <div class="meal-buttons">
-              <button data-meal="1">Приём 1</button>
-              <button data-meal="2">Приём 2</button>
-              <button data-meal="3">Приём 3</button>
+              <button data-meal="1">Приём 1</button>
+              <button data-meal="2">Приём 2</button>
+              <button data-meal="3">Приём 3</button>
             </div>
           </div>
         </div>
@@ -80,14 +85,15 @@
       Все результаты загружены.
     </div>
 
-    <form action="{{ url_for(next) }}" method="get">
+    <!-- Назад (возвращаемся туда, откуда пришли) -->
+    <form action="{{ url_for(next, day=sel_day) }}" method="get">
       <button type="submit">Назад</button>
     </form>
   </div>
 
-  <!-- JS -->
+  <!-- -------------  JS  ------------- -->
   <script>
-    /* DOM‑элементы */
+    /* DOM-элементы */
     const form         = document.querySelector('form[method="post"]');
     const firstSpinner = document.getElementById('spinner');
     const netMsg       = document.getElementById('network-message');
@@ -97,7 +103,8 @@
 
     /* Состояние */
     let page = 2, loading = false, allLoaded = false;
-    const q  = "{{ query or '' }}";
+    const q       = "{{ query or '' }}";
+    const dayParam= "{{ sel_day }}";         // <-- выбранная дата
 
     /* ---------- первый поиск ---------- */
     form.addEventListener('submit', () => {
@@ -118,7 +125,7 @@
       if (allLoaded || loading || !q) return;
       const rect=list.getBoundingClientRect();
       const sRect=loadSpinner.getBoundingClientRect();
-      if (sRect.top < rect.bottom) { loadMore(); }
+      if (sRect.top < rect.bottom) loadMore();
     }
 
     function loadMore() {
@@ -127,7 +134,8 @@
       fetch(`/product-db-data?query=${encodeURIComponent(q)}&page=${page}`)
         .then(r=>r.json()).then(data=>{
           if (data.products?.length) {
-            data.products.forEach(prod=>list.insertBefore(makeCard(prod), loadSpinner));
+            data.products.forEach(prod =>
+              list.insertBefore(makeCard(prod), loadSpinner));
             page++;
           } else { allLoaded = true; endMsg.style.display='block'; }
         })
@@ -139,25 +147,25 @@
     function makeCard(p) {
       const div = document.createElement('div');
       Object.assign(div.dataset, {
-        name: p.name, per: p.per,
-        kcal: p.kcal??'', protein: p.protein??'',
-        fat: p.fat??'', carbs: p.carbs??''
+        name:p.name, per:p.per,
+        kcal:p.kcal??'', protein:p.protein??'',
+        fat:p.fat??'', carbs:p.carbs??''
       });
       div.className = 'product-item';
       div.innerHTML = `
         <h3>${p.name}</h3>
-        <p>${p.per}: Ккал ${p.kcal??'—'}, Б ${p.protein??'—'} г,
-           Ж ${p.fat??'—'} г, У ${p.carbs??'—'} г</p>
+        <p>${p.per}: Ккал ${p.kcal??'—'}, Б ${p.protein??'—'} г,
+           Ж ${p.fat??'—'} г, У ${p.carbs??'—'} г</p>
         <div class="edit-area" style="display:none;">
           <div><input type="number" min="1" value="100" class="qty-input"> г</div>
           <div class="macro">Ккал: <span class="m-kcal"></span></div>
-          <div class="macro">Б: <span class="m-protein"></span> г,
-               Ж: <span class="m-fat"></span> г,
-               У: <span class="m-carbs"></span> г</div>
+          <div class="macro">Б: <span class="m-protein"></span> г,
+               Ж: <span class="m-fat"></span> г,
+               У: <span class="m-carbs"></span> г</div>
           <div class="meal-buttons">
-            <button data-meal="1">Приём 1</button>
-            <button data-meal="2">Приём 2</button>
-            <button data-meal="3">Приём 3</button>
+            <button data-meal="1">Приём 1</button>
+            <button data-meal="2">Приём 2</button>
+            <button data-meal="3">Приём 3</button>
           </div>
         </div>`;
       return div;
@@ -177,9 +185,8 @@
       /* Раскрываем / сворачиваем */
       document.querySelectorAll('.edit-area').forEach(a => a.style.display='none');
       const edit = card.querySelector('.edit-area');
-      if (edit.style.display === 'block') { edit.style.display='none'; return; }
-      edit.style.display = 'block';
-      calcMacros(card);
+      edit.style.display = edit.style.display === 'block' ? 'none' : 'block';
+      if (edit.style.display === 'block') calcMacros(card);
     });
 
     /* Пересчёт при изменении количества */
@@ -190,14 +197,14 @@
 
     /* ---------- функции ---------- */
     function calcMacros(card) {
-      const qty = parseFloat(card.querySelector('.qty-input').value) || 0;
-      const base = parseFloat(card.dataset.per.replace(/[^0-9.]/g,'') || 100);
-      const f = qty / base;
-      const rnd = v => isNaN(v) ? '—' : Math.round(v);
-      card.querySelector('.m-kcal'   ).textContent = rnd(card.dataset.kcal*f);
-      card.querySelector('.m-protein').textContent = rnd(card.dataset.protein*f);
-      card.querySelector('.m-fat'    ).textContent = rnd(card.dataset.fat*f);
-      card.querySelector('.m-carbs'  ).textContent = rnd(card.dataset.carbs*f);
+      const qty  = parseFloat(card.querySelector('.qty-input').value) || 0;
+      const base = parseFloat(card.dataset.per.replace(/[^0-9.]/g,'')||100);
+      const f    = qty / base;
+      const val  = v => isNaN(v) ? '—' : Math.round(v);
+      card.querySelector('.m-kcal'   ).textContent = val(card.dataset.kcal   * f);
+      card.querySelector('.m-protein').textContent = val(card.dataset.protein* f);
+      card.querySelector('.m-fat'    ).textContent = val(card.dataset.fat    * f);
+      card.querySelector('.m-carbs'  ).textContent = val(card.dataset.carbs  * f);
     }
 
     function sendProduct(card, meal) {
@@ -206,10 +213,11 @@
         method:'POST',
         headers:{'Content-Type':'application/json'},
         body:JSON.stringify({
-          name:card.dataset.name, per:card.dataset.per,
+          name:card.dataset.name,
           kcal:card.dataset.kcal, protein:card.dataset.protein,
-          fat:card.dataset.fat, carbs:card.dataset.carbs,
-          qty:qty, meal:meal
+          fat:card.dataset.fat,   carbs:card.dataset.carbs,
+          qty:qty, meal:meal,
+          date: dayParam || null        // <-- передаём выбранный день
         })
       })
       .then(r=>r.json())
