@@ -707,4 +707,166 @@ button.logout-btn { background: linear-gradient(135deg,#E14747,#E12C2C); }
   color: #fff;
 }
 
-/* ... остальной код ниже ... */
+/* ---------------------------------------------------- */
+/*  Mobile layout  ( ≤ 640 px )                         */
+/*  Полная версия: dashboard, food-entry, формы и др.   */
+/* ---------------------------------------------------- */
+@media (max-width: 640px) {
+
+  /* Предотвращаем горизонтальную прокрутку */
+  html, body {
+    overflow-x: hidden;
+  }
+
+  /* Общие отступы */
+  body {
+    padding: 0 8px;
+  }
+
+  /* FOOD-ENTRY контейнер: колонка, full-width */
+  .food-entry-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 20px 0;
+    gap: 20px;
+    box-sizing: border-box;
+  }
+
+  /* AUTH / PROFILE FORMS */
+  .container {
+    width: 95%;
+    max-width: 420px;
+    margin: 40px auto;
+    padding: 20px;
+  }
+
+  /* DASHBOARD (main.html) */
+  .dashboard-container {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    height: auto;
+  }
+  .sidebar-dashboard {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 12px;
+    width: 100%;
+  }
+  .center-area,
+  .right-col {
+    gap: 12px;
+  }
+
+  /* Выровнять ключевые зоны по 100% ширине */
+  .toolbar,
+  .left-panel,
+  .entry-content {
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* ─── Toolbar ─── */
+  .toolbar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 0;
+  }
+  .toolbar .history-container {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  .toolbar .history-header {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  .toolbar .history-header #week-picker {
+    width: 140px;
+  }
+  .toolbar .history-items {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    overflow-x: auto;
+  }
+  .toolbar .history-item {
+    min-width: 44px;
+  }
+  .toolbar .history-chart {
+    width: 28px;
+    height: 28px;
+  }
+  .toolbar .history-item.active .history-chart {
+    transform: scale(1.25);
+    filter: drop-shadow(0 0 4px #47BF21);
+  }
+  .toolbar .summary-table {
+    width: 100%;
+    display: table;
+  }
+  .toolbar .summary-table th,
+  .toolbar .summary-table td {
+    font-size: 12px;
+    padding: 6px 8px;
+    text-align: center;
+  }
+
+  /* ─── Левая панель с большим графиком ─── */
+  .left-panel {
+    margin: 0 auto;
+  }
+  .left-chart canvas {
+    width: 120px !important;
+    height: 120px !important;
+  }
+  .left-chart .back-btn {
+    padding: 8px 14px;
+  }
+
+  /* ─── Три панели приёмов пищи ─── */
+  .entry-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .meal-panel {
+    width: 100%;
+    padding: 12px;
+  }
+  .meal-table,
+  .summary-table,
+  .mini-summary-table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    font-size: 12px;
+  }
+
+  /* Прочие мелкие правки */
+  .block {
+    padding: 12px;
+  }
+  .daily-chart-container canvas {
+    width: 120px !important;
+    height: 120px !important;
+  }
+
+  /* Отступы между ключевыми секциями */
+  .toolbar,
+  .left-panel,
+  .entry-content {
+    margin-bottom: 16px;
+  }
+}
