@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Регистрация</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Подключаем стили -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Регистрация</h1>
+        <form action="{{ url_for('register') }}" method="post">
+            <label for="full_name">ФИО</label>
+            <input type="text" id="full_name" name="full_name" required>
+
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="password">Пароль</label>
+            <input type="password" id="password" name="password" required>
+
+            <button type="submit">Зарегистрироваться</button>
+        </form>
+        <!-- Кнопка "Назад" для возврата на главную страницу -->
+        <form action="{{ url_for('index') }}" method="get">
+            <button type="submit">Назад</button>
+        </form>
+    </div>
+</body>
+</html>

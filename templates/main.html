@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Главная страница</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="dashboard-container">
+
+    <!-- Левая панель (sidebar) -->
+    <aside class="sidebar-dashboard">
+      <div class="sidebar-logo">
+        <a href="{{ url_for('profile') }}" style="text-decoration: none; color: inherit;">
+          <h2>Профиль</h2>
+        </a>
+      </div>
+      <!-- Заготовка под фото пользователя -->
+      <a href="{{ url_for('profile') }}" style="text-decoration: none; color: inherit;">
+        <div class="profile-photo">
+          {% if profile.photo_path %}
+            <img src="{{ url_for('static', filename=profile.photo_path) }}" alt="Фото профиля">
+          {% endif %}
+        </div>
+      </a>
+      <!-- Профильные поля -->
+      <form method="post" class="profile-fields">
+        <label for="height">Рост</label>
+        <input type="text" id="height" name="height" value="{{ profile.height_cm or '' }}" placeholder="см" onchange="this.form.submit()">
+
+        <label for="weight">Вес</label>
+        <input type="text" id="weight" name="weight" value="{{ profile.weight_kg or '' }}" placeholder="кг" onchange="this.form.submit()">
+
+        <label for="age">Возраст</label>
+        <input type="number" id="age" name="age" value="{{ profile.age or '' }}" placeholder="лет" onchange="this.form.submit()">
+
+        <label for="gender">Пол</label>
+        <select id="gender" name="gender" onchange="this.form.submit()">
+          <option value="" disabled {% if not profile.gender %}selected{% endif %}>Выберите пол</option>
+          <option value="male" {% if profile.gender=='male' %}selected{% endif %}>Мужской</option>
+          <option value="female" {% if profile.gender=='female' %}selected{% endif %}>Женский</option>
+        </select>
+      </form>
+    </aside>
+
+    <!-- Центральная зона -->
+    <section class="center-area">
+      <div class="block diet-constructor"
+           onclick="window.location='{{ url_for('diet_constructor') }}';">
+        <h3>Конструктор рациона</h3>
+        {% if profile.target_cal %}
+          <table>
+            <tr><th>Целевые калории</th><td>{{ profile.target_cal }}</td></tr>
+            <tr><th>Белки (г)</th><td>{{ profile.protein_g }}</td></tr>
+            <tr><th>Жиры (г)</th><td>{{ profile.fat_g }}</td></tr>
+            <tr><th>Углеводы (г)</th><td>{{ profile.carbs_g }}</td></tr>
+          </table>
+        {% else %}
+          <p>Здесь будет функционал для планирования рациона, добавления продуктов и расчёта калорий.</p>
+        {% endif %}
+      </div>
+      <div class="block weekly-calories"
+           onclick="window.location='{{ url_for('food_entry') }}';">
+        <h3>Ккал за неделю</h3>
+        <div class="chart-bar">
+          <span class="chart-placeholder">Bar Chart</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Правая колонка -->
+    <section class="right-col">
+      <div class="block daily-calories" onclick="window.location='{{ url_for('food_entry') }}';">
+        <h3>Калории за сегодня</h3>
+        <div class="daily-chart-container">
+          <canvas id="daily-chart-main" width="180" height="180"></canvas>
+        </div>
+        <p class="chart-text">Потреблено: <strong>{{ totals.kcal }}</strong> Ккал</p>
+        <p class="chart-text">Цель: <strong>{{ norm_cal }}</strong> Ккал</p>
+      </div>
+      <div class="block product-db"
+           onclick="window.location='{{ url_for('product_db', next='main') }}';">
+        <h3>База продуктов</h3>
+        <p>Нажмите, чтобы просмотреть</p>
+      </div>
+    </section>
+
+  </div>
+  <script>
+    (function() {
+      const consumed = {{ totals.kcal }};
+      const norm = {{ norm_cal }};
+      const canvas = document.getElementById('daily-chart-main');
+      if (!canvas || !norm) return;
+      // High-DPI support
+      const dpr = window.devicePixelRatio || 1;
+      const size = canvas.clientWidth;
+      canvas.width = size * dpr;
+      canvas.height = size * dpr;
+      canvas.style.width = size + 'px';
+      canvas.style.height = size + 'px';
+      const ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
+      const center = size / 2;
+      const trackWidth = 16;
+      const ringWidth = 16;
+      const overflowWidth = 12;
+      // Radii
+      const trackRadius = center - trackWidth;
+      const ringRadius = center - trackWidth;
+      const overflowRadius = center - trackWidth - ringWidth - 4;
+      // Draw background track
+      ctx.lineWidth = trackWidth;
+      ctx.strokeStyle = 'rgba(100,100,100,0.2)';
+      ctx.beginPath();
+      ctx.arc(center, center, trackRadius, 0, 2 * Math.PI, false);
+      ctx.stroke();
+      // Draw main ring
+      const ratio = Math.min(consumed / norm, 1);
+      const start = -0.5 * Math.PI;
+      const end = start + ratio * 2 * Math.PI;
+      ctx.lineWidth = ringWidth;
+      ctx.strokeStyle = '#47BF21';
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.arc(center, center, ringRadius, start, end, false);
+      ctx.stroke();
+      // Draw overflow ring if any
+      if (consumed > norm) {
+        const over = Math.min((consumed - norm) / norm, 1);
+        const overEnd = start + over * 2 * Math.PI;
+        ctx.lineWidth = overflowWidth;
+        ctx.strokeStyle = '#E14747';
+        ctx.beginPath();
+        ctx.arc(center, center, overflowRadius, start, overEnd, false);
+        ctx.stroke();
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>База продуктов</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <h1>База продуктов</h1>
+
+    <!-- Поисковая форма -->
+    <form method="post" action="{{ url_for('product_db', next=next) }}">
+      <input type="hidden" name="next" value="{{ next }}">
+      <input type="text" name="query"
+             placeholder="Поиск продукта"
+             value="{{ query or '' }}" required>
+      <button type="submit">Искать</button>
+    </form>
+
+    <!-- Спиннер первого запроса -->
+    <div id="spinner" class="spinner" style="display:none;"></div>
+    <div id="network-message" class="error" style="display:none;">
+      Сервер Open Food Facts недоступен, продолжаю поиск...
+    </div>
+
+    {% if error_message %}
+      <p class="error">{{ error_message }}</p>
+    {% endif %}
+
+    <!-- Список продуктов -->
+    <div id="product-list" class="product-list">
+      {% for p in products %}
+        <div class="product-item"
+             data-name="{{ p.name }}"
+             data-per="{{ p.per }}"
+             data-kcal="{{ p.kcal or '' }}"
+             data-protein="{{ p.protein or '' }}"
+             data-fat="{{ p.fat or '' }}"
+             data-carbs="{{ p.carbs or '' }}">
+          <h3>{{ p.name }}</h3>
+          <p>
+            {{ p.per }}:
+            Ккал {{ p.kcal or "—" }},
+            Б {{ p.protein or "—" }} г,
+            Ж {{ p.fat or "—" }} г,
+            У {{ p.carbs or "—" }} г
+          </p>
+
+          <!-- Скрытая зона редактирования -->
+          <div class="edit-area" style="display:none;">
+            <div>
+              <input type="number" min="1" value="100" class="qty-input"> г
+            </div>
+
+            <div class="macro">
+              Ккал: <span class="m-kcal"></span>
+            </div>
+            <div class="macro">
+              Б: <span class="m-protein"></span> г,
+              Ж: <span class="m-fat"></span> г,
+              У: <span class="m-carbs"></span> г
+            </div>
+
+            <div class="meal-buttons">
+              <button data-meal="1">Приём 1</button>
+              <button data-meal="2">Приём 2</button>
+              <button data-meal="3">Приём 3</button>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+
+      <!-- Спиннер подгрузки следующих страниц -->
+      <div id="load-more-spinner" class="spinner" style="display:none;"></div>
+    </div>
+
+    <div id="end-message" class="info" style="display:none;">
+      Все результаты загружены.
+    </div>
+
+    <form action="{{ url_for(next) }}" method="get">
+      <button type="submit">Назад</button>
+    </form>
+  </div>
+
+  <!-- JS -->
+  <script>
+    /* DOM‑элементы */
+    const form         = document.querySelector('form[method="post"]');
+    const firstSpinner = document.getElementById('spinner');
+    const netMsg       = document.getElementById('network-message');
+    const list         = document.getElementById('product-list');
+    const loadSpinner  = document.getElementById('load-more-spinner');
+    const endMsg       = document.getElementById('end-message');
+
+    /* Состояние */
+    let page = 2, loading = false, allLoaded = false;
+    const q  = "{{ query or '' }}";
+
+    /* ---------- первый поиск ---------- */
+    form.addEventListener('submit', () => {
+      firstSpinner.style.display = 'block';
+      netMsg.style.display = endMsg.style.display = 'none';
+      loading = allLoaded = false; page = 2;
+      setTimeout(() => {
+        if (firstSpinner.style.display === 'block')
+          netMsg.style.display = 'block';
+      }, 7000);
+    });
+
+    /* ---------- бесконечная прокрутка ---------- */
+    list.addEventListener('scroll', onScroll);
+    window.addEventListener('scroll', onScroll); // если список меньше экрана
+
+    function onScroll() {
+      if (allLoaded || loading || !q) return;
+      const rect=list.getBoundingClientRect();
+      const sRect=loadSpinner.getBoundingClientRect();
+      if (sRect.top < rect.bottom) { loadMore(); }
+    }
+
+    function loadMore() {
+      loading = true;
+      loadSpinner.style.display = 'block';
+      fetch(`/product-db-data?query=${encodeURIComponent(q)}&page=${page}`)
+        .then(r=>r.json()).then(data=>{
+          if (data.products?.length) {
+            data.products.forEach(prod=>list.insertBefore(makeCard(prod), loadSpinner));
+            page++;
+          } else { allLoaded = true; endMsg.style.display='block'; }
+        })
+        .catch(console.error)
+        .finally(()=>{ loading=false; loadSpinner.style.display='none'; });
+    }
+
+    /* ---------- создание карточки ---------- */
+    function makeCard(p) {
+      const div = document.createElement('div');
+      Object.assign(div.dataset, {
+        name: p.name, per: p.per,
+        kcal: p.kcal??'', protein: p.protein??'',
+        fat: p.fat??'', carbs: p.carbs??''
+      });
+      div.className = 'product-item';
+      div.innerHTML = `
+        <h3>${p.name}</h3>
+        <p>${p.per}: Ккал ${p.kcal??'—'}, Б ${p.protein??'—'} г,
+           Ж ${p.fat??'—'} г, У ${p.carbs??'—'} г</p>
+        <div class="edit-area" style="display:none;">
+          <div><input type="number" min="1" value="100" class="qty-input"> г</div>
+          <div class="macro">Ккал: <span class="m-kcal"></span></div>
+          <div class="macro">Б: <span class="m-protein"></span> г,
+               Ж: <span class="m-fat"></span> г,
+               У: <span class="m-carbs"></span> г</div>
+          <div class="meal-buttons">
+            <button data-meal="1">Приём 1</button>
+            <button data-meal="2">Приём 2</button>
+            <button data-meal="3">Приём 3</button>
+          </div>
+        </div>`;
+      return div;
+    }
+
+    /* ---------- раскрытие карточки и выбор приёма ---------- */
+    document.addEventListener('click', e => {
+      const card = e.target.closest('.product-item');
+      if (!card) return;
+
+      /* Нажата кнопка «Приём …» */
+      if (e.target.dataset.meal) {
+        sendProduct(card, e.target.dataset.meal);
+        return;
+      }
+
+      /* Раскрываем / сворачиваем */
+      document.querySelectorAll('.edit-area').forEach(a => a.style.display='none');
+      const edit = card.querySelector('.edit-area');
+      if (edit.style.display === 'block') { edit.style.display='none'; return; }
+      edit.style.display = 'block';
+      calcMacros(card);
+    });
+
+    /* Пересчёт при изменении количества */
+    document.addEventListener('input', e => {
+      if (e.target.classList.contains('qty-input'))
+        calcMacros(e.target.closest('.product-item'));
+    });
+
+    /* ---------- функции ---------- */
+    function calcMacros(card) {
+      const qty = parseFloat(card.querySelector('.qty-input').value) || 0;
+      const base = parseFloat(card.dataset.per.replace(/[^0-9.]/g,'') || 100);
+      const f = qty / base;
+      const rnd = v => isNaN(v) ? '—' : Math.round(v);
+      card.querySelector('.m-kcal'   ).textContent = rnd(card.dataset.kcal*f);
+      card.querySelector('.m-protein').textContent = rnd(card.dataset.protein*f);
+      card.querySelector('.m-fat'    ).textContent = rnd(card.dataset.fat*f);
+      card.querySelector('.m-carbs'  ).textContent = rnd(card.dataset.carbs*f);
+    }
+
+    function sendProduct(card, meal) {
+      const qty = card.querySelector('.qty-input').value || 100;
+      fetch('/add-food', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          name:card.dataset.name, per:card.dataset.per,
+          kcal:card.dataset.kcal, protein:card.dataset.protein,
+          fat:card.dataset.fat, carbs:card.dataset.carbs,
+          qty:qty, meal:meal
+        })
+      })
+      .then(r=>r.json())
+      .then(d => { if (d.redirect) location = d.redirect; })
+      .catch(console.error);
+    }
+  </script>
+</body>
+</html>

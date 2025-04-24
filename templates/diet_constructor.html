@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Конструктор рациона</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <h1>Конструктор рациона</h1>
+    <form method="post">
+      <!-- Тип диеты -->
+      <label for="diet_type">Тип диеты</label>
+      <select id="diet_type" name="diet_type" required>
+        <option value="mass" {% if profile.diet_type=='mass' %}selected{% endif %}>Набор массы</option>
+        <option value="cutting" {% if profile.diet_type=='cutting' %}selected{% endif %}>Сушка</option>
+        <option value="maintenance" {% if profile.diet_type=='maintenance' %}selected{% endif %}>Поддержание</option>
+      </select>
+
+      <!-- Уровень активности -->
+      <label for="activity_level">Уровень активности</label>
+      <select id="activity_level" name="activity_level" required>
+        <option value="low" {% if profile.activity_level=='low' %}selected{% endif %}>Мало (1 раз в неделю)</option>
+        <option value="medium" {% if profile.activity_level=='medium' %}selected{% endif %}>Среднее (3 раза в неделю)</option>
+        <option value="high" {% if profile.activity_level=='high' %}selected{% endif %}>Активно (6 раз в неделю)</option>
+      </select>
+
+      <!-- Кнопка запуска расчёта -->
+      <button type="submit">Рассчитать план</button>
+    </form>
+
+    {% if plan %}
+      <h2 style="margin-top:20px;">Результаты расчёта</h2>
+      <table>
+        <tr><th>BMR</th><td>{{ plan.bmr }}</td></tr>
+        <tr><th>TDEE</th><td>{{ plan.tdee }}</td></tr>
+        <tr><th>Целевые калории</th><td>{{ plan.target_cal }}</td></tr>
+        <tr><th>Белки (г)</th><td>{{ plan.protein_g }}</td></tr>
+        <tr><th>Жиры (г)</th><td>{{ plan.fat_g }}</td></tr>
+        <tr><th>Углеводы (г)</th><td>{{ plan.carbs_g }}</td></tr>
+      </table>
+    {% endif %}
+
+    <!-- Кнопка назад -->
+    <form action="{{ url_for('main') }}" method="get">
+      <button style="margin-top:12px;">Назад</button>
+    </form>
+  </div>
+</body>
+</html>

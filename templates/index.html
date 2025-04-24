@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Тёмное Приложение</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <!-- Если нужно, можно включить боковую панель -->
+    <!-- <div class="sidebar">
+        <a href="#">Меню 1</a>
+        <a href="#">Меню 2</a>
+    </div> -->
+
+    <div class="container">
+        <h1>Мой Логин</h1>
+        <form action="{{ url_for('login') }}" method="post">
+            <label for="username">Логин</label>
+            <input type="text" id="username" name="username" required>
+
+            <label for="password">Пароль</label>
+            <input type="password" id="password" name="password" required>
+
+            <button type="submit">Вход</button>
+        </form>
+        <form action="{{ url_for('register') }}" method="get">
+            <button class="reg-btn" type="submit">Регистрация</button>
+        </form>
+    </div>
+</body>
+</html>
